@@ -1,0 +1,3 @@
+PORT = server_port
+DATABASE_URL = mongodb+srv://dbuser:dbpassword@cluster0.l1xn7p5.mongodb.net/dbname?retryWrites=true&w=majority
+
