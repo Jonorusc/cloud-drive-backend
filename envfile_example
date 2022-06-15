@@ -11,3 +11,5 @@ MAILING_SECRET = your client secret
 # GOOGLE OAUTH 2.0 PLAYGROUND
 MAILING_REFRESH = refresh token
 MAILING_ACCESS = access token
+
+# NOTE: RENAME THIS FILE TO .ENV
