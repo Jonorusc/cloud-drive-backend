@@ -1,6 +1,6 @@
-const { sendEmailVerification } = require("../helpers/mailer")
-const { generateToken } = require("../helpers/tokens")
-const { validateEmail, validateLength, validateUsername } = require("../helpers/validation"),
+const { sendEmailVerification } = require("../helpers/mailer"),
+    { generateToken } = require("../helpers/tokens"),
+    { validateEmail, validateLength, validateUsername } = require("../helpers/validation"),
     User = require('../models/User'),
     encrypt = require('bcrypt')
 
@@ -84,5 +84,45 @@ exports.register = async (req, res) =>  {
         })
     } catch(err) {
         res.status(500).json({ message: err.message})
+    }
+}
+// activate user account
+exports.actovateAccount = async = (req, res) => {
+    const { token } = req.body,
+        user = jwt.verify(token, process.env.TOKEN_SECRET),
+        check = await User.findById(user.id)
+
+    if(check.verified == true) {
+        return res.status(400).json({ message: 'This email is already activated' })
+    } else {
+        await = User.findByIdAndUpdate(user.id, { verified: true})
+        return res.status(200).json({ message: 'Account has been activated successfully'})
+    }
+}
+// log-in
+exports.login = async (req, res) => {
+    try {
+        const { email, password } = req.body,
+            user = await User.findOne({ email }),
+            check = await encrypt.compare(password, user.password)
+
+        if(!user)
+            return res.status(400).json({message: 'The email adress you entered is not linked to an account'})
+        
+        if(!check)
+            return res.status(400).json({message: 'Invalid credentials. Please try again'})
+    
+        const token = generateToken({id: user._id.toString()}, '7d')
+        res.send({
+            id: user._id,
+            username: user.username,
+            picture: user.picture,
+            first_name: user.first_name,
+            last_name: user.last_name,
+            token,
+            verified: user.verified,
+        })
+    } catch(err) {
+        res.status(500).json({ message: err.message })
     }
 }
