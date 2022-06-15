@@ -54,7 +54,7 @@ exports.register = async (req, res) =>  {
             Username = await validateUsername(intialUsername)
 
         // save the model in database
-        const user = new User({
+        const user = await new User({
             first_name,
             last_name,
             username: Username,
@@ -62,14 +62,14 @@ exports.register = async (req, res) =>  {
             password: cryptedPassword,
         }).save() 
 
-        const emailVerificationToken = generateToken({id:user._id.toString()}, '60m'),
+        const emailVerificationToken = generateToken({ id:user._id.toString() }, '60m'),
             
         url = `${process.env.BASE_URL}/activate/${emailVerificationToken}`
 
         // get customer data and send them an email
         sendEmailVerification(user.email, user.first_name, url)
 
-        const token = generateToken({id: user._id.toString()}, '7d')
+        const token = generateToken({ id: user._id.toString() }, '7d')
 
         // return user to the frontend
         res.json({
