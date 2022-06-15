@@ -1,3 +1,4 @@
+const { sendEmailVerification } = require("../helpers/mailer")
 const { generateToken } = require("../helpers/tokens")
 const { validateEmail, validateLength, validateUsername } = require("../helpers/validation"),
     User = require('../models/User'),
@@ -61,10 +62,26 @@ exports.register = async (req, res) =>  {
             password: cryptedPassword,
         }).save() 
 
-        const emailVerificationToken = generateToken({id:user._id.toString()}, '60m')
+        const emailVerificationToken = generateToken({id:user._id.toString()}, '60m'),
+            
+        url = `${process.env.BASE_URL}/activate/${emailVerificationToken}`
+
+        // get customer data and send them an email
+        sendEmailVerification(user.email, user.first_name, url)
+
+        const token = generateToken({id: user._id.toString()}, '7d')
 
         // return user to the frontend
-        res.json(user)
+        res.json({
+            id: user._id,
+            username: user.username,
+            picture: user.picture,
+            first_name: user.first_name,
+            last_name: user.last_name,
+            token,
+            verified: user.verified,
+            message: 'Account created successfully! Check your email to activate your account',
+        })
     } catch(err) {
         res.status(500).json({ error: err.message})
     }
