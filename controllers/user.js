@@ -87,7 +87,7 @@ exports.register = async (req, res) =>  {
     }
 }
 // activate user account
-exports.actovateAccount = async = (req, res) => {
+exports.actovateAccount = async (req, res) => {
     const { token } = req.body,
         user = jwt.verify(token, process.env.TOKEN_SECRET),
         check = await User.findById(user.id)
@@ -95,7 +95,7 @@ exports.actovateAccount = async = (req, res) => {
     if(check.verified == true) {
         return res.status(400).json({ message: 'This email is already activated' })
     } else {
-        await = User.findByIdAndUpdate(user.id, { verified: true})
+        await User.findByIdAndUpdate(user.id, { verified: true})
         return res.status(200).json({ message: 'Account has been activated successfully'})
     }
 }
