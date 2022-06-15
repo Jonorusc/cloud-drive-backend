@@ -2,3 +2,12 @@ PORT = server_port
 DATABASE_URL = mongodb+srv://dbuser:dbpassword@cluster0.l1xn7p5.mongodb.net/dbname?retryWrites=true&w=majority
 TOKEN_SECRET = any secret token that you want
 
+# MAILING KEYS
+BASE_URL = frontend url
+EMAIL = your email (i'm using google)
+# OAUTH CLIENT
+MAILING_ID = your client id-i0aknkgabcg7v7me9hr4jcg8hh55nhqv.apps.googleusercontent.com
+MAILING_SECRET = your client secret
+# GOOGLE OAUTH 2.0 PLAYGROUND
+MAILING_REFRESH = refresh token
+MAILING_ACCESS = access token
