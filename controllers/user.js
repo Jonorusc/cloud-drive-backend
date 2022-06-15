@@ -57,7 +57,7 @@ exports.register = async (req, res) =>  {
         const user = await new User({
             first_name,
             last_name,
-            username: Username,
+            username: Username.replace(/ /g, ""),
             email,
             password: cryptedPassword,
         }).save() 
