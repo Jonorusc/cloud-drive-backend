@@ -4,13 +4,11 @@ const mongoose = require('mongoose'),
         first_name: {
             type: String,
             required: [true, 'First name is required'],
-            trim: true,
             text: true,
         },
         last_name: {
             type: String,
             required: [true, 'First name is required'],
-            trim: true,
             text: true,
         },
         username: {
@@ -29,6 +27,11 @@ const mongoose = require('mongoose'),
             type: String,
             required: [true, 'Password is required'],
             trim: true,
+        },
+        picture: {
+            type: String,
+            trim: true,
+            default: 'https://cdn-icons-png.flaticon.com/512/21/21104.png'
         },
         verified: {
             type: Boolean,
