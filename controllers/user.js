@@ -12,7 +12,7 @@ exports.register = async (req, res) =>  {
             last_name,
             email,
             password,
-        } = res.body
+        } = req.body
 
         if(!validateEmail(email)) {
             return res.status(400).json({ 
@@ -83,6 +83,6 @@ exports.register = async (req, res) =>  {
             message: 'Account created successfully! Check your email to activate your account',
         })
     } catch(err) {
-        res.status(500).json({ error: err.message})
+        res.status(500).json({ message: err.message})
     }
 }
