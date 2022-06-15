@@ -1,3 +1,4 @@
+const { generateToken } = require("../helpers/tokens")
 const { validateEmail, validateLength, validateUsername } = require("../helpers/validation"),
     User = require('../models/User'),
     encrypt = require('bcrypt')
@@ -59,6 +60,8 @@ exports.register = async (req, res) =>  {
             email,
             password: cryptedPassword,
         }).save() 
+
+        const emailVerificationToken = generateToken({id:user._id.toString()}, '60m')
 
         // return user to the frontend
         res.json(user)
