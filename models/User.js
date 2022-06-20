@@ -38,9 +38,17 @@ const mongoose = require('mongoose'),
             default: false,
         },
         drive: [{
+            folders: {
+                type: ObjectId,
+                id: null,
+                ref: 'files',
+                excluded: false,
+            },
             files: {
                 type: ObjectId,
-                ref: 'files'
+                folder_id: null,
+                ref: 'files',
+                excluded: false,
             }
         }]
     }, {timestamps: true})
