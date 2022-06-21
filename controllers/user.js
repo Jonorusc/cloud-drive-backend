@@ -149,3 +149,26 @@ exports.login = async (req, res) => {
         res.status(500).json({ message: err.message })
     }
 }
+// send verification
+exports.sendVerification = async (req, res) => {
+    try {
+        const id = req.user.id
+        const user = await User.findById(id)
+
+        if(user.verified) 
+            return res.status(400).json({ message: 'This account is already activated!' })
+
+        const emailVerificationToken = generateToken(
+            { id: user._id.toString()},
+            '30m'
+        )
+        const url = `${process.env.BASE_URL}/activate/${emailVerificationToken}`
+        sendEmailVerification(user.email, user.first_name, url)
+
+        return res.status(200).json({
+            message: 'A verification email has been sent you. Expires in 30 minutes',
+        })
+    } catch (err) {
+        return res.status(500).json({ message: err.message })
+    }
+}   
