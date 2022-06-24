@@ -1,4 +1,4 @@
-const { sendEmailVerification } = require('../helpers/mailer'),
+const { sendEmailVerification, sendCodeVerification } = require('../helpers/mailer'),
     { generateToken } = require('../helpers/tokens'),
     {
         validateEmail,
@@ -6,8 +6,11 @@ const { sendEmailVerification } = require('../helpers/mailer'),
         validateUsername,
     } = require('../helpers/validation'),
     User = require('../models/User'),
+    Code = require('../models/Code'),
     encrypt = require('bcrypt'),
-    jwt = require('jsonwebtoken')
+    jwt = require('jsonwebtoken'),
+    generateCode = require('../helpers/generateCode')
+
 
 exports.register = async (req, res) => {
     try {
@@ -79,6 +82,7 @@ exports.register = async (req, res) => {
             id: user._id,
             username: user.username,
             picture: user.picture,
+            email: user.email,
             first_name: user.first_name,
             last_name: user.last_name,
             token,
@@ -139,6 +143,7 @@ exports.login = async (req, res) => {
         res.send({
             id: user._id,
             username: user.username,
+            email: user.email,
             picture: user.picture,
             first_name: user.first_name,
             last_name: user.last_name,
@@ -169,6 +174,87 @@ exports.sendVerification = async (req, res) => {
             message: 'A verification email has been sent you. Expires in 30 minutes',
         })
     } catch (err) {
-        return res.status(500).json({ message: err.message })
+        return res.status(500).json({ message: 'There was en error, try again later....' })
     }
 }   
+// find a user
+exports.findUser = async (req, res) => {
+    try {
+        const email = req.body.email,
+        user = await User.findOne({ email }).select('-password')
+
+        if(!user) {
+            return res.status(400).json({
+                message: 'Account does not exist!'
+            })
+        } else {
+            return res.status(200).json({
+                email: user.email,
+                first_name: user.first_name,
+                picture: user.picture,
+                message: 'true'
+            })
+        }
+
+    } catch (err) {
+        return res.status(500).json({ message: err.message})
+    }
+}
+// reset password
+exports.sendResetCode = async (req, res) => {
+    try {
+        const { email } = req.body,
+        user = await User.findOne({ email }).select('-password')
+
+        await Code.findOneAndRemove({ user:user._id })
+        const code = generateCode(6),
+        savedCode = await new Code({
+            code,
+            user: user._id,
+        }).save()
+
+        sendCodeVerification(user.email, user.first_name, code)
+
+        return res.status(200).json({
+            message: 'An email with the code verification has been sent to your email'
+        })
+
+    } catch (err) {
+        return res.status(500).json({ message: err.message})
+    }
+} 
+
+// validate code
+exports.validateResetCode = async (req, res) => {
+    try {
+        const { email, code } = req.body,
+        user = await User.findOne({ email }),
+        db_code = await Code.findOne({ user:user._id })
+
+        if(db_code.code !== code) {
+            return res.status(400).json({
+                message: 'Verification code is wrong!',
+            })
+        } 
+        return res.status(200).json({message: 'true'})
+    } catch (err) {
+        return res.status(500).json({ message: err.message})
+    }
+}
+// change password
+exports.changePassword = async (req, res) => {
+    try {
+        const { email, password } = req.body,
+        cryptedPassword = await encrypt.hashSync(password, 15)
+        
+        await User.findOneAndUpdate({ email }, {
+            password: cryptedPassword,
+        })
+
+        return res.status(200).json({
+            message: 'true'
+        })
+    } catch (err) {
+        return res.status(500).json({ message: err.message})
+    }
+}
