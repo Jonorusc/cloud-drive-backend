@@ -30,6 +30,35 @@ exports.sendEmailVerification = (email, name, url) => {
         }
     stmp.sendMail(mailOptions, (err, res) => {
         if(err) return err
-        ;return res
+        return res
+    })    
+}
+// code
+exports.sendCodeVerification = (email, name, code) => {
+    auth.setCredentials({
+        refresh_token: MAILING_REFRESH,
+    })
+    const accessToken = auth.getAccessToken(),
+        stmp = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                type: 'OAuth2',
+                user: EMAIL,
+                clientId: MAILING_ID,
+                clientSecret: MAILING_SECRET,
+                refreshToken: MAILING_REFRESH,
+                accessToken,
+            }
+        }),
+        mailOptions = {
+            form: EMAIL,
+            to: email,
+            subject: 'Cloud Drive reset your password',
+            html: `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Cloud Drive Mailing</title><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"><style>body{background-color:#eee;display:grid;place-items:center}.wrap{width:300px;background-color:#fff;padding:1rem;box-sizing:border-box;display:grid;row-gap:2rem;justify-content:center;place-items:center;border-radius:10px}h1>i{color:#6986a5;font-weight:600}h1{letter-spacing:-1px;color:#6986a5}p{font-size:24px}a{background-color:#6986a5;border:none;border-radius:5px;height:54px;width:100%;font-size:16px;text-transform:uppercase;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;column-gap:1rem;text-decoration:none;margin-bottom:2rem}a:active{background-color:#6986A590}</style></head><body><h1><i class="fa-solid fa-envelope"></i>Cloud Drive<div class="wrap"><div><h2>Hello! ${name}</h2><p>Did you requested a password redefinition? then we sent you a link to help you with that<br><br><small>Your reset code is:<div>${code}</div></small></p></div></div></body></html>`, 
+            //mail.html.min
+        }
+    stmp.sendMail(mailOptions, (err, res) => {
+        if(err) return err
+        return res
     })    
 }
