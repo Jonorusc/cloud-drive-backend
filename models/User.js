@@ -32,29 +32,12 @@ const mongoose = require('mongoose'),
             picture: {
                 type: String,
                 trim: true,
-                default: 'https://cdn-icons-png.flaticon.com/512/21/21104.png',
+                // default: 'https://cdn-icons-png.flaticon.com/512/21/21104.png',
             },
             verified: {
                 type: Boolean,
                 default: false,
             },
-            drive: [
-                {
-                    folders: {
-                        type: String,
-                        id: null,
-                        ref: 'folder',
-                        excluded: false,
-                        files: [
-                            {
-                                type: String,
-                                ref: 'file',
-                                excluded: false,
-                            },
-                        ],
-                    },
-                },
-            ],
         },
         { timestamps: true }
     )
