@@ -38,6 +38,10 @@ const mongoose = require('mongoose'),
                 type: Boolean,
                 default: false,
             },
+            storage: {
+                type: Number,
+                default: 150000,
+            },
         },
         { timestamps: true }
     )
